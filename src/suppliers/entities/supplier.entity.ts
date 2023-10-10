@@ -1,5 +1,5 @@
 import { User } from "src/auth/entities/user.entity";
-import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('suppliers')
 export class Supplier {

@@ -19,7 +19,6 @@ export class CreateProductDto {
   @Transform(({ value }) => Number(value))
   price: number;
 
-  @IsNotEmpty({ each: true })
-  @IsArray()
+  @IsOptional()
   images: string[];
 }

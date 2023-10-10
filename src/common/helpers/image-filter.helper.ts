@@ -10,5 +10,5 @@ export const imageFilter = (req: Express.Request, file: Express.Multer.File, cal
     return callback(null, true);
   }
 
-  callback(null, false)
+  callback(null,false);
 }

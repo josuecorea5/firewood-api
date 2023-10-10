@@ -1,11 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors, ParseFilePipe, HttpStatus, BadRequestException } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Roles } from 'src/auth/enums/roles.enum';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { imageFilter } from 'src/common/helpers/image-filter.helper';
+import { diskStorage } from 'multer';
+import { generateImageName } from 'src/common/helpers/image-name.helper';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { User } from 'src/auth/entities/user.entity';
 
 @Controller('products')
 export class ProductsController {
@@ -13,17 +17,20 @@ export class ProductsController {
 
   @Auth(Roles.ADMIN)
   @Post()
-  @UseInterceptors(FileInterceptor('images', {
-    fileFilter: imageFilter
+  @UseInterceptors(FilesInterceptor('images',3, {
+    fileFilter: imageFilter,
+    storage: diskStorage({filename: generateImageName})
   }))
   create(
     @Body() createProductDto: CreateProductDto,
-    @UploadedFiles() files: Express.Multer.File[]
-    ) {
-    return {
-      ...createProductDto,
-      files
-    }
+    @GetUser() user: User,
+    @UploadedFiles(
+      new ParseFilePipe({
+        exceptionFactory: () => new BadRequestException('Format image not valid'),
+      })
+    ) files: Express.Multer.File[]
+  ) {
+    return this.productsService.create(createProductDto, files, user);
   }
 
   @Get()

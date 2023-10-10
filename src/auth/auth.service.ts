@@ -45,7 +45,6 @@ export class AuthService {
     const { email, password } = loginDto;
 
     const user = await this.userRepository.findOne({ where: { email}, select: { email: true, password: true}});
-
     if(!user) {
       throw new BadRequestException('Invalid credentials');
     }

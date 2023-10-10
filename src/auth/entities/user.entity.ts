@@ -1,4 +1,5 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Supplier } from "src/suppliers/entities/supplier.entity";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
 export class User {
@@ -28,6 +29,12 @@ export class User {
 
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
   updatedAt: Date;
+
+  @OneToMany(
+    () => Supplier,
+    (supplier) => supplier.user,
+  )
+  supplier: Supplier;
 
   @BeforeInsert()
   emailToLowerCase() {

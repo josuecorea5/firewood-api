@@ -1,9 +1,10 @@
 import { Transform } from "class-transformer";
-import { IsString, MinLength } from "class-validator";
+import { IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class CreateSupplierDto {
   @IsString()
-  @Transform(({ value }) => value?.replace(/[\s]/g, ''))
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
   @MinLength(8)
   fullName: string;
 
@@ -13,7 +14,8 @@ export class CreateSupplierDto {
   telephone: string;
 
   @IsString()
-  @Transform(({ value }) => value?.replace(/[\s]/g, ''))
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
   @MinLength(8)
   address: string;
 }

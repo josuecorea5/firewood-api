@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { validate as isUUID } from 'uuid';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Supplier } from './entities/supplier.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class SuppliersService {
@@ -31,12 +33,40 @@ export class SuppliersService {
     }
   }
 
-  findAll() {
-    return this.supplierRepository.find();
+  async findAll(paginationDto: PaginationDto) {
+    const { limit=10, offset = 0 } = paginationDto;
+
+    try {
+      const suppliers = await this.supplierRepository.find({
+        take: limit,
+        skip: offset
+      });
+
+      return suppliers;
+      
+    } catch (error) {
+      throw new InternalServerErrorException('Error processing request');
+    }
+
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} supplier`;
+  async findOne(term: string) {
+    
+    let supplier: Supplier;
+
+    if(isUUID(term)) {
+      supplier = await this.supplierRepository.findOneBy( {id: term } );
+    }else {
+      const queryBuilder = this.supplierRepository.createQueryBuilder('supplier');
+      supplier = await queryBuilder
+        .where('lower(supplier.fullName) =:fullName', { fullName: term.toLowerCase() }).getOne();
+    }
+
+    if(!supplier) {
+      throw new BadRequestException('Supplier not found');
+    }
+
+    return supplier;
   }
 
   update(id: number, updateSupplierDto: UpdateSupplierDto) {

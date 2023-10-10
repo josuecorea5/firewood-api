@@ -1,3 +1,4 @@
+import { Product } from "src/products/entities/product.entity";
 import { Supplier } from "src/suppliers/entities/supplier.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -35,6 +36,12 @@ export class User {
     (supplier) => supplier.user,
   )
   supplier: Supplier;
+
+  @OneToMany(
+    () => Product,
+    (product) => product.user
+  )
+  product: Product;
 
   @BeforeInsert()
   emailToLowerCase() {

@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { SuppliersModule } from './suppliers/suppliers.module';
     }),
     CommonModule,
     AuthModule,
-    SuppliersModule
+    SuppliersModule,
+    ProductsModule
   ],
   controllers: [],
   providers: [],

@@ -39,7 +39,8 @@ export class SuppliersService {
     try {
       const suppliers = await this.supplierRepository.find({
         take: limit,
-        skip: offset
+        skip: offset,
+        where: { isActive: true }
       });
 
       return suppliers;
@@ -55,11 +56,11 @@ export class SuppliersService {
     let supplier: Supplier;
 
     if(isUUID(term)) {
-      supplier = await this.supplierRepository.findOneBy( {id: term } );
+      supplier = await this.supplierRepository.findOneBy( {id: term, isActive: true } );
     }else {
       const queryBuilder = this.supplierRepository.createQueryBuilder('supplier');
       supplier = await queryBuilder
-        .where('lower(supplier.fullName) =:fullName', { fullName: term.toLowerCase() }).getOne();
+        .where('lower(supplier.fullName) =:fullName AND supplier.isActive =:isActive', { fullName: term.toLowerCase(), isActive: true }).getOne();
     }
 
     if(!supplier) {
@@ -87,8 +88,10 @@ export class SuppliersService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} supplier`;
+  async remove(id: string) {
+    const supplier = await this.findOne(id);
+    await this.supplierRepository.update(supplier.id, { isActive: false })
+    return true;
   }
 
   private handleDbException(error: any) {

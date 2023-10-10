@@ -42,8 +42,9 @@ export class SuppliersController {
     return this.suppliersService.update(id, updateSupplierDto, user);
   }
 
+  @Auth(Roles.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.suppliersService.remove(+id);
+    return this.suppliersService.remove(id);
   }
 }

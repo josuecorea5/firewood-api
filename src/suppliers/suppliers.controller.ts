@@ -33,9 +33,13 @@ export class SuppliersController {
     return this.suppliersService.findOne(term);
   }
 
+  @Auth(Roles.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSupplierDto: UpdateSupplierDto) {
-    return this.suppliersService.update(+id, updateSupplierDto);
+  update(
+    @Param('id') id: string, @Body() updateSupplierDto: UpdateSupplierDto,
+    @GetUser() user: User
+    ) {
+    return this.suppliersService.update(id, updateSupplierDto, user);
   }
 
   @Delete(':id')

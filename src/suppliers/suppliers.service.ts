@@ -69,8 +69,22 @@ export class SuppliersService {
     return supplier;
   }
 
-  update(id: number, updateSupplierDto: UpdateSupplierDto) {
-    return `This action updates a #${id} supplier`;
+  async update(id: string, updateSupplierDto: UpdateSupplierDto, user: User) {
+    const supplier = await this.supplierRepository.preload({ id, ...updateSupplierDto });
+
+    if(!supplier) {
+      throw new BadRequestException('Supplier not found');
+    }
+
+    supplier.user = user;
+
+    try {
+      await this.supplierRepository.save(supplier);
+      delete supplier.user;
+      return supplier;
+    } catch (error) {
+      this.handleDbException(error);
+    }
   }
 
   remove(id: number) {

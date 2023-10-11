@@ -40,12 +40,29 @@ export class ProductsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+    return this.productsService.findOne(id);
   }
 
+  @Auth(Roles.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  @UseInterceptors(FilesInterceptor('images', 3, {
+    fileFilter: imageFilter,
+    storage: diskStorage({filename: generateImageName})
+  }))
+  update(
+    @Param('id') id: string, 
+    @Body() updateProductDto: UpdateProductDto,
+    @GetUser() user: User,
+    @UploadedFiles(
+      new ParseFilePipe({
+        exceptionFactory: () => new BadRequestException('Format image not valid'),
+        fileIsRequired: false
+      })
+    )
+    files: Express.Multer.File[]
+    ) {
+      console.log('HHEHEHE')
+    return this.productsService.update(id, updateProductDto, files, user);
   }
 
   @Delete(':id')

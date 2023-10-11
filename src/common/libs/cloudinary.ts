@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
 
@@ -23,5 +23,17 @@ export class Cloudinary {
     )
   
     return uploadedImages;
+  }
+
+  async deleteImage(images: string[]) {
+    try {
+      await Promise.all(
+        images.map(async (public_id) => {
+          await cloudinary.uploader.destroy(public_id)
+        })
+      )
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }

@@ -5,7 +5,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { Cloudinary } from 'src/common/libs/cloudinary';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ProductImage } from './entities/product-image.entity';
 
 @Injectable()
@@ -18,7 +18,8 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
-    private readonly cloudinary: Cloudinary
+    private readonly cloudinary: Cloudinary,
+    private readonly dataSource: DataSource
   ) { 
   }
 
@@ -48,16 +49,73 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll() {
+    const products =  await this.productRepository.find();
+    return products.map(product => ({
+      ...product,
+      images: product.images.map(image => image.url)
+    }))
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string) {
+    const product = await this.productRepository.findOneBy({ id });
+
+    if(!product) {
+      throw new BadRequestException('Product not found');
+    }
+
+    return {
+      ...product,
+      images: product.images.map(image => image.url)
+    }
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto, files: Express.Multer.File[], user: User) {
+    
+    const { images, ...productDto } = updateProductDto;
+
+    const produt = await this.productRepository.findOneBy({ id });
+
+    const productToUpdate = await this.productRepository.preload({
+      id,
+      ...productDto
+    })
+
+    if(!produt) {
+      throw new BadRequestException('Product not found');
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      if(files.length > 0) {
+        
+        const uploadImages = await this.cloudinary.uploadImage(files.map(file => file.path));
+
+        productToUpdate.images = uploadImages.map(image => this.productImageRepository.create({
+          public_id: image.public_id,
+          url: image.secure_url
+        }))
+
+        await this.cloudinary.deleteImage(produt.images.map(image => image.public_id));
+      }
+
+      productToUpdate.user = user;
+      await queryRunner.manager.save(productToUpdate);
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      this.handleDbException(error);
+    }
+
+    return this.findOne(id);
+
   }
 
   remove(id: number) {

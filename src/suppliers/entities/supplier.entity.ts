@@ -1,5 +1,6 @@
 import { User } from "src/auth/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Buying } from "src/buyings/entities/buying.entity";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('suppliers')
 export class Supplier {
@@ -29,4 +30,10 @@ export class Supplier {
     (user) => user.supplier
   )
   user: User;
+
+  @OneToMany(
+    () => Buying,
+    (buying) => buying.supplier
+  )
+  buying: Buying
 }

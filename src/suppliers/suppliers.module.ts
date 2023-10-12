@@ -12,5 +12,6 @@ import { Supplier } from './entities/supplier.entity';
     AuthModule,
     TypeOrmModule.forFeature([Supplier])
   ],
+  exports: [TypeOrmModule]
 })
 export class SuppliersModule {}

@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { ProductsModule } from './products/products.module';
+import { BuyingsModule } from './buyings/buyings.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { ProductsModule } from './products/products.module';
     CommonModule,
     AuthModule,
     SuppliersModule,
-    ProductsModule
+    ProductsModule,
+    BuyingsModule
   ],
   controllers: [],
   providers: [],

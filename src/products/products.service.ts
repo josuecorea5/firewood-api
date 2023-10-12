@@ -50,7 +50,7 @@ export class ProductsService {
   }
 
   async findAll() {
-    const products =  await this.productRepository.find();
+    const products =  await this.productRepository.find({where: { isAvailable: true }});
     return products.map(product => ({
       ...product,
       images: product.images.map(image => image.url)
@@ -58,7 +58,7 @@ export class ProductsService {
   }
 
   async findOne(id: string) {
-    const product = await this.productRepository.findOneBy({ id });
+    const product = await this.productRepository.findOneBy({ id, isAvailable: true });
 
     if(!product) {
       throw new BadRequestException('Product not found');
@@ -107,19 +107,28 @@ export class ProductsService {
       await queryRunner.manager.save(productToUpdate);
       await queryRunner.commitTransaction();
       await queryRunner.release();
+      
+      return this.findOne(id);
 
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
       this.handleDbException(error);
     }
-
-    return this.findOne(id);
-
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    try {
+      const product = await this.productRepository.findOneBy({ id });
+
+      if(!product) {
+        throw new BadRequestException('Product not found');
+      }
+      await this.productRepository.update(id, { isAvailable: false});
+      return true;
+    } catch (error) {
+      this.handleDbException(error);
+    }
   }
 
   private handleDbException(error: any) {

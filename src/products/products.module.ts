@@ -15,5 +15,6 @@ import { CommonModule } from 'src/common/common.module';
   ],
   controllers: [ProductsController],
   providers: [ProductsService],
+  exports: [TypeOrmModule]
 })
 export class ProductsModule {}

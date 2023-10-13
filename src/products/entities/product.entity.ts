@@ -1,6 +1,7 @@
 import { User } from "src/auth/entities/user.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ProductImage } from "./product-image.entity";
+import { Inventory } from "src/inventory/entities/inventory.entity";
 
 @Entity()
 export class Product {
@@ -31,6 +32,12 @@ export class Product {
     { cascade: true, eager: true}
   )
   images: ProductImage[];
+
+  @OneToMany(
+    () => Inventory,
+    (inventory) => inventory.product
+  )
+  inventory: Inventory
 
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;

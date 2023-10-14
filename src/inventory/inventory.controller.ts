@@ -20,23 +20,32 @@ export class InventoryController {
     return this.inventoryService.create(createInventoryDto, user);
   }
 
+  @Auth(Roles.ADMIN)
   @Get()
   findAll() {
     return this.inventoryService.findAll();
   }
 
+  @Auth(Roles.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.inventoryService.findOne(+id);
+    return this.inventoryService.findOne(id);
   }
 
+  @Auth(Roles.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInventoryDto: UpdateInventoryDto) {
-    return this.inventoryService.update(+id, updateInventoryDto);
+  update(
+    @Param('id') id: string, 
+    @Body() updateInventoryDto: UpdateInventoryDto,
+    @GetUser() user: User
+  ) {
+    console.log('HEEEE')
+    console.log(user);
+    return this.inventoryService.update(id, updateInventoryDto, user);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.inventoryService.remove(+id);
+    return this.inventoryService.remove(id);
   }
 }

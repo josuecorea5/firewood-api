@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -29,10 +29,10 @@ export class InventoryService {
     const product = await this.productRepository.findOneBy({ id: productId });
 
     if(!buying) {
-      throw new BadRequestException('Buying not found');
+      throw new NotFoundException('Buying not found');
     }
 
-    if(!product) {
+    if(!product || !product.isAvailable) {
       throw new BadRequestException('Product not found');
     }
 
@@ -58,18 +58,58 @@ export class InventoryService {
   }
 
   findAll() {
-    return `This action returns all inventory`;
+    return this.inventoryRepository.find({where: {isActive: true}});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inventory`;
+  async findOne(id: string) {
+    const inventory = await this.inventoryRepository.findOneBy({ id, isActive: true });
+
+    if(!inventory) {
+      throw new NotFoundException('Inventory not found');
+    }
+
+    return inventory;
   }
 
-  update(id: number, updateInventoryDto: UpdateInventoryDto) {
-    return `This action updates a #${id} inventory`;
+  async update(id: string, updateInventoryDto: UpdateInventoryDto, user: User) {
+
+    const { buyingId, productId, ...inventoryDto } = updateInventoryDto;
+
+    const inventory = await this.inventoryRepository.preload({
+      id,
+      ...inventoryDto,
+      user
+    })
+
+    if(!inventory) {
+      throw new NotFoundException('Inventory not found');
+    }
+
+    const buying = await this.buyingRepository.findOneBy({ id: buyingId} );
+    const product = await this.productRepository.findOneBy({ id: productId });
+
+    if(!buying) {
+      throw new NotFoundException('Buying not found');
+    }
+
+    if(!product || !product.isAvailable) {
+      throw new BadRequestException('Product not found');
+    }
+
+    inventory.buying = buying;
+    inventory.product = product;
+
+    await this.inventoryRepository.save(inventory);
+
+    delete inventory.user;
+
+    return inventory;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} inventory`;
+  async remove(id: string) {
+    await this.findOne(id);
+
+    await this.inventoryRepository.update(id, { isActive: false})
+    return true;
   }
 }

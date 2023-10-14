@@ -1,7 +1,7 @@
 import { User } from "src/auth/entities/user.entity";
 import { Buying } from "src/buyings/entities/buying.entity";
 import { Product } from "src/products/entities/product.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('inventory')
 export class Inventory {
@@ -36,7 +36,9 @@ export class Inventory {
   buying: Buying;
 
   @ManyToOne(
-    () => Product
+    () => Product,
+    (product) => product.inventory,
+    { eager: true}
   )
   product: Product;
 }

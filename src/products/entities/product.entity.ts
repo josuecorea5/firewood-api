@@ -2,6 +2,7 @@ import { User } from "src/auth/entities/user.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ProductImage } from "./product-image.entity";
 import { Inventory } from "src/inventory/entities/inventory.entity";
+import { Sale } from "src/sales/entities/sale.entity";
 
 @Entity()
 export class Product {
@@ -38,6 +39,12 @@ export class Product {
     (inventory) => inventory.product
   )
   inventory: Inventory
+
+  @OneToMany(
+    () => Sale,
+    (sale) => sale.product
+  )
+  sales: Sale
 
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;

@@ -16,6 +16,6 @@ import { BuyingsModule } from 'src/buyings/buyings.module';
   ],
   controllers: [InventoryController],
   providers: [InventoryService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, InventoryService]
 })
 export class InventoryModule {}

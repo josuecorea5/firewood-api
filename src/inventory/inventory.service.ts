@@ -71,6 +71,31 @@ export class InventoryService {
     return inventory;
   }
 
+  async findStockByProductId(productId: string) {
+    const inventory = await this.inventoryRepository.find({
+      order: { createdAt: 'DESC'},
+      where: {
+        product: { id: productId },
+        isActive: true,
+      }
+    })
+
+    if(!inventory) {
+      throw new NotFoundException('Inventory not found');
+    }
+
+    return inventory[0];
+  }
+
+  async changeStateInventory(id: string, isActive: boolean) {
+    const inventory = await this.inventoryRepository.findOneBy({ id });
+
+    if(!inventory) {
+      throw new NotFoundException('Inventory not found');
+    }
+    await this.inventoryRepository.update(id, { isActive })
+  }
+
   async update(id: string, updateInventoryDto: UpdateInventoryDto, user: User) {
 
     const { buyingId, productId, ...inventoryDto } = updateInventoryDto;

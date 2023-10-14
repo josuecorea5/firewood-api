@@ -76,11 +76,15 @@ export class SalesService {
   }
 
   findAll() {
-    return `This action returns all sales`;
+    return this.saleRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sale`;
+  async findOne(id: string) {
+    const sale = await this.saleRepository.findOneBy({ id });
+    if(!sale) {
+      throw new NotFoundException('Sale not found');
+    }
+    return sale;
   }
 
   update(id: number, updateSaleDto: UpdateSaleDto) {

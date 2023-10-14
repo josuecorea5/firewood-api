@@ -20,14 +20,16 @@ export class SalesController {
     return this.salesService.create(createSaleDto, user);
   }
 
+  @Auth(Roles.ADMIN)
   @Get()
   findAll() {
     return this.salesService.findAll();
   }
 
+  @Auth(Roles.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.salesService.findOne(+id);
+    return this.salesService.findOne(id);
   }
 
   @Patch(':id')

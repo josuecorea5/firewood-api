@@ -55,6 +55,8 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
+    delete user.password;
+
     return {
       ...user,
       accessToken: this.generateJwt({ id: user.id })

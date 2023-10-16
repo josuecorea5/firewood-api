@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sale } from './entities/sale.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -133,10 +132,6 @@ export class SalesService {
       await queryRunner.release();
       this.handleError(error);
     }
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} sale`;
   }
 
   private handleError(error: any) {

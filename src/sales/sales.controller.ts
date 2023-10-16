@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Roles } from 'src/auth/enums/roles.enum';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
@@ -39,10 +38,5 @@ export class SalesController {
     @GetUser() user: User
   ) {
     return this.salesService.update(id, user);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesService.remove(+id);
   }
 }

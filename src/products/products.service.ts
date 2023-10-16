@@ -44,7 +44,6 @@ export class ProductsService {
       }
       
     } catch (error) {
-      console.log(error)
       this.handleDbException(error);
     }
   }

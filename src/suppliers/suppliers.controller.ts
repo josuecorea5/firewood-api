@@ -7,7 +7,10 @@ import { User } from 'src/auth/entities/user.entity';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Roles } from 'src/auth/enums/roles.enum';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ApiBearerAuth, ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('suppliers')
+@ApiBearerAuth()
 @Controller('suppliers')
 export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}
@@ -29,12 +32,14 @@ export class SuppliersController {
 
   @Auth(Roles.ADMIN)
   @Get(':term')
+  @ApiParam({name: 'term', type: String, description: 'Term could be supplier name or supplierId'})
   findOne(@Param('term') term: string) {
     return this.suppliersService.findOne(term);
   }
 
   @Auth(Roles.ADMIN)
   @Patch(':id')
+  @ApiBody({type: UpdateSupplierDto})
   update(
     @Param('id') id: string, @Body() updateSupplierDto: UpdateSupplierDto,
     @GetUser() user: User

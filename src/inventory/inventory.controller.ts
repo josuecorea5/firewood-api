@@ -6,7 +6,10 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Roles } from 'src/auth/enums/roles.enum';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('inventory')
+@ApiBearerAuth()
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
@@ -39,8 +42,6 @@ export class InventoryController {
     @Body() updateInventoryDto: UpdateInventoryDto,
     @GetUser() user: User
   ) {
-    console.log('HEEEE')
-    console.log(user);
     return this.inventoryService.update(id, updateInventoryDto, user);
   }
 

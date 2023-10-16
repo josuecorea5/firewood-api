@@ -6,7 +6,10 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Roles } from 'src/auth/enums/roles.enum';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('buyings')
+@ApiBearerAuth()
 @Controller('buyings')
 export class BuyingsController {
   constructor(private readonly buyingsService: BuyingsService) {}

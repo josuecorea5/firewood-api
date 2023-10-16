@@ -10,7 +10,10 @@ import { diskStorage } from 'multer';
 import { generateImageName } from 'src/common/helpers/image-name.helper';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
+import { ApiTags, ApiConsumes, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('products')
+@ApiBearerAuth()
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -21,6 +24,7 @@ export class ProductsController {
     fileFilter: imageFilter,
     storage: diskStorage({filename: generateImageName})
   }))
+  @ApiConsumes('multipart/form-data')
   create(
     @Body() createProductDto: CreateProductDto,
     @GetUser() user: User,
@@ -51,6 +55,7 @@ export class ProductsController {
     fileFilter: imageFilter,
     storage: diskStorage({filename: generateImageName})
   }))
+  @ApiConsumes('multipart/form-data')
   update(
     @Param('id') id: string, 
     @Body() updateProductDto: UpdateProductDto,
@@ -63,10 +68,10 @@ export class ProductsController {
     )
     files: Express.Multer.File[]
     ) {
-      console.log('HHEHEHE')
     return this.productsService.update(id, updateProductDto, files, user);
   }
 
+  @ApiResponse({description: 'A boolean that indicates if the product was deleted'})
   @Auth(Roles.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {

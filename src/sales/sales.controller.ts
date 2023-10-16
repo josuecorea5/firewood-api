@@ -36,10 +36,9 @@ export class SalesController {
   @Patch(':id')
   update(
     @Param('id') id: string, 
-    @Body() updateSaleDto: UpdateSaleDto,
     @GetUser() user: User
   ) {
-    return this.salesService.update(id, updateSaleDto, user);
+    return this.salesService.update(id, user);
   }
 
   @Delete(':id')

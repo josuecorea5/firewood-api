@@ -8,6 +8,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { SaleStatus } from './enums/sales-status.enum';
+import { Inventory } from 'src/inventory/entities/inventory.entity';
 
 @Injectable()
 export class SalesService {
@@ -23,27 +24,43 @@ export class SalesService {
 
   async create(createSaleDto: CreateSaleDto, user: User) {
     const { productId, ...saleDto } = createSaleDto;
-    
     const queryRunner = this.dataSource.createQueryRunner();
+    
     
     const product = await this.productRepository.findOneBy({ id: productId, isAvailable: true});
     
     if(!product) {
       throw new NotFoundException('Product not found');
     }
-
+    
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const stockInventory = await this.inventoryService.findStockByProductId(productId);
+      const stocksInventory = await this.inventoryService.findStockByProductId(productId);
+      let quantity = createSaleDto.quantity;
 
-      if(!stockInventory) {
+      if(stocksInventory.length === 0) {
         throw new BadRequestException('Product not available in stock');
       }
 
-      if(stockInventory.stock < saleDto.quantity) {
-        throw new BadRequestException('Insufficient stock');
+      for(const inventory of stocksInventory) {
+        if(quantity <= 0) {
+          break;
+        }
+        const deductableQuantity = Math.min(quantity, inventory.stock);
+
+        await queryRunner.manager.update(Inventory, inventory.id, { stock: inventory.stock - deductableQuantity})
+
+        if((inventory.stock - deductableQuantity) === 0) {
+          await queryRunner.manager.update(Inventory, inventory.id, { isActive: false })
+        }
+
+        quantity -= deductableQuantity;
+      }
+
+      if(quantity > 0) {
+        throw new BadRequestException('Product not available in stock');
       }
 
       const sale = this.saleRepository.create({
@@ -51,14 +68,6 @@ export class SalesService {
         product: product,
         user: user
       })
-
-      const inventoryUpdated =  await this.inventoryService.update(stockInventory.id, {
-        stock: stockInventory.stock - saleDto.quantity,
-      }, user)
-
-      if(inventoryUpdated.stock === 0) {
-        await this.inventoryService.changeStateInventory(stockInventory.id, false);
-      }
 
       sale.total = Number((sale.quantity * product.price).toFixed(2));
 
@@ -88,10 +97,9 @@ export class SalesService {
     return sale;
   }
 
-  async update(id: string, updateSaleDto: UpdateSaleDto, user: User) {
+  async update(id: string, user: User) {
 
     const sale = await this.saleRepository.findOneBy({ id });
-    const newSale = sale;
 
     if(!sale) {
       throw new NotFoundException('Sale not found');
@@ -106,41 +114,19 @@ export class SalesService {
 
       const inventoryByProduct = await this.inventoryService.findStockByProductId(sale.product.id);
 
-      if(!inventoryByProduct) {
+      if(!inventoryByProduct || !inventoryByProduct[0]?.isActive) {
         throw new BadRequestException('Product not available in stock');
       }
 
-      await this.inventoryService.update(inventoryByProduct.id, {
-        stock: inventoryByProduct.stock + sale.quantity,
+      await this.inventoryService.update(inventoryByProduct[0]?.id, {
+        stock: inventoryByProduct[0]?.stock + sale.quantity,
       }, user);
-
-      if(updateSaleDto.productId) {
-        const product = await this.productRepository.findOneBy({ id: updateSaleDto.productId, isAvailable: true});
-    
-        if(!product) {
-          throw new NotFoundException('Product not found');
-        }
-        newSale.product = product;
-      }else {
-        newSale.product = sale.product;
-      }
-  
-      if(updateSaleDto.quantity) {
-        newSale.quantity = updateSaleDto.quantity;
-      }else {
-        newSale.quantity = sale.quantity;
-      }
-
-      const updatedSale = await this.create({
-        productId: newSale.product.id,
-        quantity: newSale.quantity,
-      }, user)
 
       await this.saleRepository.update(id, { status: SaleStatus.CANCELLED })
       await queryRunner.commitTransaction();
       await queryRunner.release();
 
-      return updatedSale;
+      return { message: 'Sale cancelled successfully' };
 
     } catch (error) {
       await queryRunner.rollbackTransaction();

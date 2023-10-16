@@ -84,7 +84,7 @@ export class InventoryService {
       throw new NotFoundException('Inventory not found');
     }
 
-    return inventory[0];
+    return inventory;
   }
 
   async changeStateInventory(id: string, isActive: boolean) {

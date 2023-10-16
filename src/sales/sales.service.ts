@@ -3,10 +3,11 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sale } from './entities/sale.entity';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { SaleStatus } from './enums/sales-status.enum';
 
 @Injectable()
 export class SalesService {
@@ -25,14 +26,14 @@ export class SalesService {
     
     const queryRunner = this.dataSource.createQueryRunner();
     
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    
     const product = await this.productRepository.findOneBy({ id: productId, isAvailable: true});
-
+    
     if(!product) {
       throw new NotFoundException('Product not found');
     }
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
       const stockInventory = await this.inventoryService.findStockByProductId(productId);
@@ -87,8 +88,65 @@ export class SalesService {
     return sale;
   }
 
-  update(id: number, updateSaleDto: UpdateSaleDto) {
-    return `This action updates a #${id} sale`;
+  async update(id: string, updateSaleDto: UpdateSaleDto, user: User) {
+
+    const sale = await this.saleRepository.findOneBy({ id });
+    const newSale = sale;
+
+    if(!sale) {
+      throw new NotFoundException('Sale not found');
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {      
+
+      const inventoryByProduct = await this.inventoryService.findStockByProductId(sale.product.id);
+
+      if(!inventoryByProduct) {
+        throw new BadRequestException('Product not available in stock');
+      }
+
+      await this.inventoryService.update(inventoryByProduct.id, {
+        stock: inventoryByProduct.stock + sale.quantity,
+      }, user);
+
+      if(updateSaleDto.productId) {
+        const product = await this.productRepository.findOneBy({ id: updateSaleDto.productId, isAvailable: true});
+    
+        if(!product) {
+          throw new NotFoundException('Product not found');
+        }
+        newSale.product = product;
+      }else {
+        newSale.product = sale.product;
+      }
+  
+      if(updateSaleDto.quantity) {
+        newSale.quantity = updateSaleDto.quantity;
+      }else {
+        newSale.quantity = sale.quantity;
+      }
+
+      const updatedSale = await this.create({
+        productId: newSale.product.id,
+        quantity: newSale.quantity,
+      }, user)
+
+      await this.saleRepository.update(id, { status: SaleStatus.CANCELLED })
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      return updatedSale;
+
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      this.handleError(error);
+    }
   }
 
   remove(id: number) {

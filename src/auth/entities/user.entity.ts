@@ -3,7 +3,7 @@ import { Inventory } from "src/inventory/entities/inventory.entity";
 import { Product } from "src/products/entities/product.entity";
 import { Sale } from "src/sales/entities/sale.entity";
 import { Supplier } from "src/suppliers/entities/supplier.entity";
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('users')
 export class User {
@@ -31,7 +31,7 @@ export class User {
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
   updatedAt: Date;
 
   @OneToMany(

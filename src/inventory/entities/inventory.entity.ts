@@ -1,7 +1,7 @@
 import { User } from "src/auth/entities/user.entity";
 import { Buying } from "src/buyings/entities/buying.entity";
 import { Product } from "src/products/entities/product.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('inventory')
 export class Inventory {
@@ -20,7 +20,7 @@ export class Inventory {
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
   updatedAt: Date;
 
   @ManyToOne(

@@ -32,9 +32,14 @@ export class SalesController {
     return this.salesService.findOne(id);
   }
 
+  @Auth(Roles.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
-    return this.salesService.update(+id, updateSaleDto);
+  update(
+    @Param('id') id: string, 
+    @Body() updateSaleDto: UpdateSaleDto,
+    @GetUser() user: User
+  ) {
+    return this.salesService.update(id, updateSaleDto, user);
   }
 
   @Delete(':id')

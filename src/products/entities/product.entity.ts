@@ -1,5 +1,5 @@
 import { User } from "src/auth/entities/user.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ProductImage } from "./product-image.entity";
 import { Inventory } from "src/inventory/entities/inventory.entity";
 import { Sale } from "src/sales/entities/sale.entity";
@@ -49,6 +49,6 @@ export class Product {
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
   updatedAt: Date;
 }

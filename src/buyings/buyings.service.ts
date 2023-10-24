@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateBuyingDto } from './dto/create-buying.dto';
 import { UpdateBuyingDto } from './dto/update-buying.dto';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from '../auth/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Buying } from './entities/buying.entity';
+import { Buying } from '../buyings/entities/buying.entity';
 import { Repository } from 'typeorm';
-import { Supplier } from 'src/suppliers/entities/supplier.entity';
+import { Supplier } from '../suppliers/entities/supplier.entity';
 
 @Injectable()
 export class BuyingsService {
@@ -60,6 +60,8 @@ export class BuyingsService {
       ...buyingDto,
       user
     });
+
+    console.log(buying);
 
     if(!buying) {
       throw new BadRequestException('Buying not found');

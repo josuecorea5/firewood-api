@@ -1,6 +1,6 @@
-import { User } from "src/auth/entities/user.entity";
-import { Inventory } from "src/inventory/entities/inventory.entity";
-import { Supplier } from "src/suppliers/entities/supplier.entity";
+import { User } from "../../auth/entities/user.entity";
+import { Inventory } from "../../inventory/entities/inventory.entity";
+import { Supplier } from "../../suppliers/entities/supplier.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('buyings')

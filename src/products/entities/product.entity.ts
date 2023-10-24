@@ -1,8 +1,8 @@
-import { User } from "src/auth/entities/user.entity";
+import { User } from "../../auth/entities/user.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ProductImage } from "./product-image.entity";
-import { Inventory } from "src/inventory/entities/inventory.entity";
-import { Sale } from "src/sales/entities/sale.entity";
+import { Inventory } from "../../inventory/entities/inventory.entity";
+import { Sale } from "../../sales/entities/sale.entity";
 
 @Entity()
 export class Product {

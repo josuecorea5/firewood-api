@@ -1,5 +1,5 @@
-import { User } from "src/auth/entities/user.entity";
-import { Buying } from "src/buyings/entities/buying.entity";
+import { User } from "../../auth/entities/user.entity";
+import { Buying } from "../../buyings/entities/buying.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('suppliers')

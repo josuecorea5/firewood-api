@@ -1,8 +1,8 @@
-import { Buying } from "src/buyings/entities/buying.entity";
-import { Inventory } from "src/inventory/entities/inventory.entity";
-import { Product } from "src/products/entities/product.entity";
-import { Sale } from "src/sales/entities/sale.entity";
-import { Supplier } from "src/suppliers/entities/supplier.entity";
+import { Buying } from "../../buyings/entities/buying.entity";
+import { Inventory } from "../../inventory/entities/inventory.entity";
+import { Product } from "../../products/entities/product.entity";
+import { Sale } from "../../sales/entities/sale.entity";
+import { Supplier } from "../../suppliers/entities/supplier.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('users')

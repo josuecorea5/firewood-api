@@ -14,6 +14,6 @@ import { SuppliersModule } from 'src/suppliers/suppliers.module';
   ],
   controllers: [BuyingsController],
   providers: [BuyingsService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, Buying]
 })
 export class BuyingsModule {}

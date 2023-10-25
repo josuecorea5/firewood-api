@@ -158,7 +158,12 @@ describe('SalesService', () => {
         buying: {} as Buying,
         product: {} as Product
       }]);
-      
+
+      try {
+        await saleService.create(saleCreateDto, { id: '123'} as User);
+      } catch (error) {
+        expect(error.message).toEqual('Product not available in stock');
+      }
     })
 
     it('should create a sale', async() => {

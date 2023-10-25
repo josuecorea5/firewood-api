@@ -3,11 +3,11 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sale } from './entities/sale.entity';
 import { DataSource, Repository } from 'typeorm';
-import { Product } from 'src/products/entities/product.entity';
+import { Product } from '../products/entities/product.entity';
 import { User } from 'src/auth/entities/user.entity';
-import { InventoryService } from 'src/inventory/inventory.service';
+import { InventoryService } from '../inventory/inventory.service';
 import { SaleStatus } from './enums/sales-status.enum';
-import { Inventory } from 'src/inventory/entities/inventory.entity';
+import { Inventory } from '../inventory/entities/inventory.entity';
 
 @Injectable()
 export class SalesService {

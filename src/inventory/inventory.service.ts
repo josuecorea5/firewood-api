@@ -4,9 +4,9 @@ import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inventory } from './entities/inventory.entity';
 import { Repository } from 'typeorm';
-import { Buying } from 'src/buyings/entities/buying.entity';
-import { Product } from 'src/products/entities/product.entity';
-import { User } from 'src/auth/entities/user.entity';
+import { Buying } from '../buyings/entities/buying.entity';
+import { Product } from '../products/entities/product.entity';
+import { User } from '../auth/entities/user.entity';
 
 @Injectable()
 export class InventoryService {

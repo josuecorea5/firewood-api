@@ -128,73 +128,73 @@ describe('BuyingsService', () => {
         expect(error.message).toEqual('Supplier not found')
       }
     })
-
-    describe('find buyings', () => {
-      it('should return all buyins', async() => {
-        jest.spyOn(buyingRepository, 'find').mockResolvedValue(mockBuyings)
-        const result = await buyingService.findAll();
-        expect(result.length).toEqual(2);
-      })
-
-      it('should return a buying by id', async() => {
-        jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue(mockBuyings[0]);
-        const result = await buyingService.findOne('123');
-        expect(result.id).toEqual('123');
-      })
-
-      it('should throw an error when buying not found', async() => {
-        jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue(null);
-        try {
-          await buyingService.findOne('123');
-        } catch (error) {
-          expect(error.message).toEqual('Buying not found');
-        }
-      })
+  })
+  
+  describe('find buyings', () => {
+    it('should return all buyins', async() => {
+      jest.spyOn(buyingRepository, 'find').mockResolvedValue(mockBuyings)
+      const result = await buyingService.findAll();
+      expect(result.length).toEqual(2);
     })
 
-    describe('Update a buying', () => {
-      it('should update a buying', async() => {
-        const buyingDto = {
-          title: 'Test updated',
-          supplierId: '1234'
-        }
-        jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue({
-          id: '123'
-        } as Buying);
-        jest.spyOn(supplierRepository, 'findOneBy').mockResolvedValue({ id: '123' } as Supplier);
-        jest.spyOn(buyingRepository, 'preload').mockResolvedValue({
-          id: '123',
-          title: buyingDto.title,
-         } as Buying);
+    it('should return a buying by id', async() => {
+      jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue(mockBuyings[0]);
+      const result = await buyingService.findOne('123');
+      expect(result.id).toEqual('123');
+    })
 
-        await buyingService.update('123', buyingDto, { id: '123'} as User)
+    it('should throw an error when buying not found', async() => {
+      jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue(null);
+      try {
+        await buyingService.findOne('123');
+      } catch (error) {
+        expect(error.message).toEqual('Buying not found');
+      }
+    })
+  })
 
-        expect(buyingRepository.preload).toHaveBeenCalledWith({ id: '123', title: buyingDto.title, user: { id: '123' } as User });
-        expect(buyingRepository.save).toHaveBeenCalled();
-      })
+  describe('Update a buying', () => {
+    it('should update a buying', async() => {
+      const buyingDto = {
+        title: 'Test updated',
+        supplierId: '1234'
+      }
+      jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue({
+        id: '123'
+      } as Buying);
+      jest.spyOn(supplierRepository, 'findOneBy').mockResolvedValue({ id: '123' } as Supplier);
+      jest.spyOn(buyingRepository, 'preload').mockResolvedValue({
+        id: '123',
+        title: buyingDto.title,
+       } as Buying);
 
-      it('should throw an error when buying not found', async() => {
-        jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue(null);
-        try {
-          await buyingService.update('123', {title: 'test updated'}, {} as User);
-        } catch (error) {
-          expect(error.message).toEqual('Buying not found');
-        }
-      })
+      await buyingService.update('123', buyingDto, { id: '123'} as User)
 
-      it('should throw an error when supplier not found', async() => {
-        jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue({ id: '123' } as Buying);
-        jest.spyOn(supplierRepository, 'findOneBy').mockResolvedValue(null);
-        jest.spyOn(buyingRepository, 'preload').mockResolvedValue({
-          id: '123',
-          title: 'test updated',
-         } as Buying);
-        try {
-          await buyingService.update('123', {title: 'test updated'}, {} as User);
-        } catch (error) {
-          expect(error.message).toEqual('Supplier not found');
-        }
-      })
+      expect(buyingRepository.preload).toHaveBeenCalledWith({ id: '123', title: buyingDto.title, user: { id: '123' } as User });
+      expect(buyingRepository.save).toHaveBeenCalled();
+    })
+
+    it('should throw an error when buying not found', async() => {
+      jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue(null);
+      try {
+        await buyingService.update('123', {title: 'test updated'}, {} as User);
+      } catch (error) {
+        expect(error.message).toEqual('Buying not found');
+      }
+    })
+
+    it('should throw an error when supplier not found', async() => {
+      jest.spyOn(buyingRepository, 'findOneBy').mockResolvedValue({ id: '123' } as Buying);
+      jest.spyOn(supplierRepository, 'findOneBy').mockResolvedValue(null);
+      jest.spyOn(buyingRepository, 'preload').mockResolvedValue({
+        id: '123',
+        title: 'test updated',
+       } as Buying);
+      try {
+        await buyingService.update('123', {title: 'test updated'}, {} as User);
+      } catch (error) {
+        expect(error.message).toEqual('Supplier not found');
+      }
     })
   })
 })

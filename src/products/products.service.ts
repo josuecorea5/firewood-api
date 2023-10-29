@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { User } from 'src/auth/entities/user.entity';
-import { Cloudinary } from 'src/common/libs/cloudinary';
+import { Cloudinary } from '../common/libs/cloudinary';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -119,7 +119,6 @@ export class ProductsService {
   async remove(id: string) {
     try {
       const product = await this.productRepository.findOneBy({ id });
-
       if(!product) {
         throw new BadRequestException('Product not found');
       }

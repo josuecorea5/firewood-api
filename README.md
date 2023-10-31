@@ -68,3 +68,10 @@ $ npm run test
 # test coverage
 $ npm run test:cov
 ```
+
+## Documentation
+
+### Swagger
+```bash
+http:localhost:3000/api/docs
+```
